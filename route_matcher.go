@@ -41,7 +41,7 @@ func NewStringRouteMatcher(method, pattern string, handler http.Handler) RouteMa
 	}
 }
 
-func NewVariableRouteMatcher(pattern, method string, handler http.Handler) RouteMatcher {
+func NewVariableRouteMatcher(method, pattern string, handler http.Handler) RouteMatcher {
 	patternSections := strings.Split(pattern, "/")
 	return func(r *http.Request) (http.Handler, bool) {
 		if r.Method != method {
