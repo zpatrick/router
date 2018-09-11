@@ -12,44 +12,32 @@ type RouteMatcher func(r *http.Request) (http.Handler, bool)
 
 func NewGlobRouteMatcher(method, pattern string, handler http.Handler) RouteMatcher {
 	return func(r *http.Request) (http.Handler, bool) {
-		if r.Method != method {
-			return nil, false
+		if r.Method == method && glob.Glob(pattern, r.URL.Path) {
+			return handler, true
 		}
 
-		if !glob.Glob(pattern, r.URL.Path) {
-			return nil, false
-		}
-
-		return handler, true
+		return nil, false
 	}
 }
 
 func NewRegexRouteMatcher(method, pattern string, handler http.Handler) RouteMatcher {
 	re := regexp.MustCompile(pattern)
 	return func(r *http.Request) (http.Handler, bool) {
-		if r.Method != method {
-			return nil, false
+		if r.Method == method && re.MatchString(r.URL.Path) {
+			return handler, true
 		}
 
-		if !re.MatchString(r.URL.Path) {
-			return nil, false
-		}
-
-		return handler, true
+		return nil, false
 	}
 }
 
 func NewStringRouteMatcher(method, pattern string, handler http.Handler) RouteMatcher {
 	return func(r *http.Request) (http.Handler, bool) {
-		if r.Method != method {
-			return nil, false
+		if r.Method == method && r.URL.Path == pattern {
+			return handler, true
 		}
 
-		if r.URL.Path != pattern {
-			return nil, false
-		}
-
-		return handler, true
+		return nil, false
 	}
 }
 
