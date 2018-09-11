@@ -2,6 +2,8 @@ package router
 
 import "net/http"
 
+type MethodHandlers map[string]http.Handler
+
 type RouteMap map[string]MethodHandlers
 
 func (r RouteMap) Glob() []RouteMatcher {

@@ -1,28 +1,35 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Router struct {
 	NotFound func(http.ResponseWriter, *http.Request)
-	// StrictSlash?
 	matchers []RouteMatcher
 }
 
-func NewRouter(matchers []RouteMatcher) *Router {
-	return &Router{
+func NewRouter(matchers []RouteMatcher, options ...RouterOption) *Router {
+	r := &Router{
 		NotFound: http.NotFound,
 		matchers: matchers,
 	}
+
+	for _, option := range options {
+		option(r)
+	}
+
+	return r
 }
 
-func (o *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	for _, match := range o.matchers {
-		handler, ok := match(r)
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	for _, match := range r.matchers {
+		handler, ok := match(req)
 		if ok {
-			handler.ServeHTTP(w, r)
+			handler.ServeHTTP(w, req)
 			return
 		}
 	}
 
-	o.NotFound(w, r)
+	r.NotFound(w, req)
 }
