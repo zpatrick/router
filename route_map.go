@@ -6,6 +6,16 @@ type MethodHandlers map[string]http.Handler
 
 type RouteMap map[string]MethodHandlers
 
+func (r RouteMap) ApplyMiddleware(middleware ...Middleware) {
+	for path, methodHandlers := range r {
+		for method, _ := range methodHandlers {
+			for _, middleware := range middleware {
+				r[path][method] = middleware(r[path][method])
+			}
+		}
+	}
+}
+
 func (r RouteMap) GlobMatch() []RouteMatcher {
 	return r.constructMatchers(NewGlobRouteMatcher)
 }

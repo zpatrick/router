@@ -74,6 +74,7 @@ func main() {
 		},
 	}
 
+	rm.ApplyMiddleware(router.LoggingMiddleware)
 	r := router.NewRouter(rm.VariableMatch())
 	log.Printf("Listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", r))
