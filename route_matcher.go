@@ -42,23 +42,23 @@ func NewStringRouteMatcher(method, pattern string, handler http.Handler) RouteMa
 }
 
 func NewVariableRouteMatcher(method, pattern string, handler http.Handler) RouteMatcher {
-	patternSections := strings.Split(pattern, "/")
+	patternSegments := Segments(pattern)
 	return func(r *http.Request) (http.Handler, bool) {
 		if r.Method != method {
 			return nil, false
 		}
 
-		pathSections := strings.Split(r.URL.Path, "/")
-		if len(pathSections) != len(patternSections) {
+		pathSegments := Segments(r.URL.Path)
+		if len(pathSegments) != len(patternSegments) {
 			return nil, false
 		}
 
-		for i := 0; i < len(patternSections); i++ {
-			if strings.HasPrefix(patternSections[i], ":") {
+		for i := 0; i < len(patternSegments); i++ {
+			if strings.HasPrefix(patternSegments[i], ":") {
 				continue
 			}
 
-			if pathSections[i] != patternSections[i] {
+			if pathSegments[i] != patternSegments[i] {
 				return nil, false
 			}
 		}
