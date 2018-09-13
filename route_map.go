@@ -8,7 +8,7 @@ type MethodHandlers map[string]http.Handler
 // RouteMap map url path patterns to MethodHandlers.
 type RouteMap map[string]MethodHandlers
 
-// ApplyMiddlware applies each of the specified middleware to each http.Handler in r.
+// ApplyMiddlware applies each middleware to each http.Handler in r.
 func (rm RouteMap) ApplyMiddleware(middleware ...Middleware) {
 	for path, methodHandlers := range rm {
 		for method, _ := range methodHandlers {

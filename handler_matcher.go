@@ -9,11 +9,11 @@ import (
 )
 
 // A HandlerMatcher is a function that matches a *http.Request to a http.Handler.
-type HandlerMatcher func(r *http.Request) (h http.Handler, matchFound bool)
+type HandlerMatcher func(r *http.Request) (hander http.Handler, matchFound bool)
 
-// NewGlobHandlerMatcher returns a HandlerMatcher that matches
-// if method equals the *http.Request.Method,
-// and if pattern glob matches the *http.Request.URL.Path.
+// NewGlobHandlerMatcher returns a HandlerMatcher that returns a match if and only if
+// the request.Method matches method,
+// and the request.URL.Path glob matches pattern.
 func NewGlobHandlerMatcher(method, pattern string, handler http.Handler) HandlerMatcher {
 	return func(r *http.Request) (http.Handler, bool) {
 		if r.Method == method && glob.Glob(pattern, r.URL.Path) {
@@ -24,9 +24,9 @@ func NewGlobHandlerMatcher(method, pattern string, handler http.Handler) Handler
 	}
 }
 
-// NewRegexHandlerMatcher returns a HandlerMatcher that matches
-// if method equals the *http.Request.Method,
-// and if pattern regex matches the *http.Request.URL.Path.
+// NewRegexHandlerMatcher returns a HandlerMatcher that returns a match if and only if
+// the request.Method matches method,
+// and the request.URL.Path regex matches pattern.
 func NewRegexHandlerMatcher(method, pattern string, handler http.Handler) HandlerMatcher {
 	re := regexp.MustCompile(pattern)
 	return func(r *http.Request) (http.Handler, bool) {
@@ -38,9 +38,9 @@ func NewRegexHandlerMatcher(method, pattern string, handler http.Handler) Handle
 	}
 }
 
-// NewStringHandlerMatcher returns a HandlerMatcher that matches
-// if method equals the *http.Request.Method,
-// and if pattern matches the *http.Request.URL.Path.
+// NewStringHandlerMatcher returns a HandlerMatcher that returns a match if and only if
+// the request.Method matches method,
+// and the request.URL.Path matches pattern.
 func NewStringHandlerMatcher(method, pattern string, handler http.Handler) HandlerMatcher {
 	return func(r *http.Request) (http.Handler, bool) {
 		if r.Method == method && r.URL.Path == pattern {
@@ -51,15 +51,15 @@ func NewStringHandlerMatcher(method, pattern string, handler http.Handler) Handl
 	}
 }
 
-// NewVariableHandlerMatcher returns a HandlerMatcher that matches
-// if method equals the *http.Request.Method,
-// and if pattern variable matches the *http.Request.URL.Path.
-// Path variables are specified by placing a ':' in front of the variable name.
+// NewVariableHandlerMatcher returns a HandlerMatcher that returns a match if and only if
+// the request.Method matches method,
+// and the request.URL.Path variable matches pattern.
+// Path variables are specified in pattern by placing a ':' in front of the variable name.
 // This is just for human-readability, it denotes that any value can be used
 // in the specified segment. Path variables can be fetched using the Segment helper functions.
 // Note that the following are functionally equivalent:
-//   NewVariableHandlerMatcher(http.MethodGet, "/product/:productID/", foo)
-//   NewGlobHandlerMatcher(http.MethodGet, "/product/*/", foo)
+//   NewVariableHandlerMatcher(http.MethodGet, "/product/:productID/", handler)
+//   NewGlobHandlerMatcher(http.MethodGet, "/product/*/", handler)
 func NewVariableHandlerMatcher(method, pattern string, handler http.Handler) HandlerMatcher {
 	patternSegments := Segments(pattern)
 	return func(r *http.Request) (http.Handler, bool) {

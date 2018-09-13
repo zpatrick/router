@@ -97,11 +97,20 @@ func ExampleMiddleware() {
 	}
 
 	rm := RouteMap{}
-	rm.ApplyMiddleware(
-		LoggingMiddleware,
-		BasicAuthMiddleware("admin", "password"),
-		myMiddleware,
-	)
+	rm.ApplyMiddleware(myMiddleware)
+
+	r := NewRouter(rm.StringMatch())
+	http.Handle("/", r)
+}
+
+func ExampleLoggingMiddleware() {
+	rm := RouteMap{}
+	rm.ApplyMiddleware(LoggingMiddleware)
+}
+
+func ExampleBasicAuthMiddleware() {
+	rm := RouteMap{}
+	rm.ApplyMiddleware(BasicAuthMiddleware("admin", "password"))
 }
 
 func ExampleRouteMap_GlobMatch() {
@@ -169,14 +178,7 @@ func ExampleRouteMap_VariableMatch() {
 }
 
 func ExampleRouter() {
-	myNotFoundHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-	}
-
-	r := &Router{
-		Matchers: []HandlerMatcher{},
-		NotFound: myNotFoundHandler,
-	}
-
+	rm := RouteMap{}
+	r := NewRouter(rm.StringMatch())
 	http.Handle("/", r)
 }

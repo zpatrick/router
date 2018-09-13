@@ -19,7 +19,7 @@ func NewRouter(matchers []HandlerMatcher) *Router {
 }
 
 // ServeHTTP attempts to match r to a http.Handler using o.Matchers.
-// If no match is found, the o.NotFound is executed.
+// If no match is found, o.NotFound is executed.
 func (o *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, match := range o.Matchers {
 		handler, ok := match(r)
