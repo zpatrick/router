@@ -4,32 +4,30 @@ import (
 	"net/http"
 )
 
+// Router is the root handler for an application.
 type Router struct {
+	Matchers []HandlerMatcher
 	NotFound func(http.ResponseWriter, *http.Request)
-	matchers []RouteMatcher
 }
 
-func NewRouter(matchers []RouteMatcher, options ...RouterOption) *Router {
-	r := &Router{
+// NewRouter returns an initialized Router with the specified matchers.
+func NewRouter(matchers []HandlerMatcher) *Router {
+	return &Router{
+		Matchers: matchers,
 		NotFound: http.NotFound,
-		matchers: matchers,
 	}
-
-	for _, option := range options {
-		option(r)
-	}
-
-	return r
 }
 
-func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	for _, match := range r.matchers {
-		handler, ok := match(req)
+// ServeHTTP attempts to match r to a http.Handler using o.Matchers.
+// If no match is found, the o.NotFound is executed.
+func (o *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for _, match := range o.Matchers {
+		handler, ok := match(r)
 		if ok {
-			handler.ServeHTTP(w, req)
+			handler.ServeHTTP(w, r)
 			return
 		}
 	}
 
-	r.NotFound(w, req)
+	o.NotFound(w, r)
 }

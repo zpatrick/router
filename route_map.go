@@ -2,39 +2,46 @@ package router
 
 import "net/http"
 
+// MethodHandlers map http methods to http.Handlers.
 type MethodHandlers map[string]http.Handler
 
+// RouteMap map url path patterns to MethodHandlers.
 type RouteMap map[string]MethodHandlers
 
-func (r RouteMap) ApplyMiddleware(middleware ...Middleware) {
-	for path, methodHandlers := range r {
+// ApplyMiddlware applies each of the specified middleware to each http.Handler in r.
+func (rm RouteMap) ApplyMiddleware(middleware ...Middleware) {
+	for path, methodHandlers := range rm {
 		for method, _ := range methodHandlers {
 			for _, middleware := range middleware {
-				r[path][method] = middleware(r[path][method])
+				rm[path][method] = middleware(rm[path][method])
 			}
 		}
 	}
 }
 
-func (r RouteMap) GlobMatch() []RouteMatcher {
-	return r.constructMatchers(NewGlobRouteMatcher)
+// GlobMatch returns HandlerMatchers for each http.Handler in r using NewGlobHandlerMatcher.
+func (rm RouteMap) GlobMatch() []HandlerMatcher {
+	return rm.constructMatchers(NewGlobHandlerMatcher)
 }
 
-func (r RouteMap) RegexMatch() []RouteMatcher {
-	return r.constructMatchers(NewRegexRouteMatcher)
+// RegexMatch returns HandlerMatchers for each http.Handler in r using NewRegexHandlerMatcher.
+func (rm RouteMap) RegexMatch() []HandlerMatcher {
+	return rm.constructMatchers(NewRegexHandlerMatcher)
 }
 
-func (r RouteMap) StringMatch() []RouteMatcher {
-	return r.constructMatchers(NewStringRouteMatcher)
+// StringMatch returns HandlerMatchers for each http.Handler in r using NewStringHandlerMatcher.
+func (rm RouteMap) StringMatch() []HandlerMatcher {
+	return rm.constructMatchers(NewStringHandlerMatcher)
 }
 
-func (r RouteMap) VariableMatch() []RouteMatcher {
-	return r.constructMatchers(NewVariableRouteMatcher)
+// VariableMatch returns HandlerMatchers for each http.Handler in r using NewVariableHandlerMatcher.
+func (rm RouteMap) VariableMatch() []HandlerMatcher {
+	return rm.constructMatchers(NewVariableHandlerMatcher)
 }
 
-func (r RouteMap) constructMatchers(constructor func(string, string, http.Handler) RouteMatcher) []RouteMatcher {
-	matchers := []RouteMatcher{}
-	for pattern, methodHandlers := range r {
+func (rm RouteMap) constructMatchers(constructor func(string, string, http.Handler) HandlerMatcher) []HandlerMatcher {
+	matchers := []HandlerMatcher{}
+	for pattern, methodHandlers := range rm {
 		for method, handler := range methodHandlers {
 			matchers = append(matchers, constructor(method, pattern, handler))
 		}
