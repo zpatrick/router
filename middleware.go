@@ -2,7 +2,6 @@ package router
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -17,16 +16,11 @@ func LoggingMiddleware(handler http.Handler) http.Handler {
 }
 
 func BasicAuthMiddleware(username, password string) Middleware {
-	hash := func(user, pass string) string {
-		sum := sha256.Sum256([]byte(user + pass))
-		return fmt.Sprintf("%x", sum)
-	}
-
-	key := hash(username, password)
+	sum := sha256.Sum256([]byte(username + password))
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			user, pass, ok := r.BasicAuth()
-			if ok && hash(user, pass) == key {
+			if ok && sha256.Sum256([]byte(user+pass)) == sum {
 				handler.ServeHTTP(w, r)
 			}
 
