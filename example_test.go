@@ -98,14 +98,11 @@ func ExampleMiddleware() {
 
 	rm := RouteMap{}
 	rm.ApplyMiddleware(myMiddleware)
-
-	r := NewRouter(rm.StringMatch())
-	http.Handle("/", r)
 }
 
 func ExampleLoggingMiddleware() {
 	rm := RouteMap{}
-	rm.ApplyMiddleware(LoggingMiddleware)
+	rm.ApplyMiddleware(LoggingMiddleware())
 }
 
 func ExampleBasicAuthMiddleware() {

@@ -9,7 +9,7 @@ import (
 )
 
 // A HandlerMatcher is a function that matches a *http.Request to a http.Handler.
-type HandlerMatcher func(r *http.Request) (hander http.Handler, matchFound bool)
+type HandlerMatcher func(r *http.Request) (handler http.Handler, matchFound bool)
 
 // NewGlobHandlerMatcher returns a HandlerMatcher that returns a match if and only if
 // the request.Method matches method,
@@ -55,8 +55,8 @@ func NewStringHandlerMatcher(method, pattern string, handler http.Handler) Handl
 // the request.Method matches method,
 // and the request.URL.Path variable matches pattern.
 // Path variables are specified in pattern by placing a ':' in front of the variable name.
-// This is just for human-readability, it denotes that any value can be used
-// in the specified segment. Path variables can be fetched using the Segment helper functions.
+// Using a path variable in pattern simply denotes that any value can be used in that path segment.
+// Path variables can be fetched using the Segment helper functions.
 // Note that the following are functionally equivalent:
 //   NewVariableHandlerMatcher(http.MethodGet, "/product/:productID/", handler)
 //   NewGlobHandlerMatcher(http.MethodGet, "/product/*/", handler)

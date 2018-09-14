@@ -9,12 +9,14 @@ import (
 // Middleware is a function that adds functionality to a handler.
 type Middleware func(http.Handler) http.Handler
 
-// LoggingMiddleware is a Middleware that logs requests' methods and paths.
-func LoggingMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL.Path)
-		handler.ServeHTTP(w, r)
-	})
+// LoggingMiddleware returns a Middleware that logs requests' methods and paths.
+func LoggingMiddleware() Middleware {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Printf("%s %s", r.Method, r.URL.Path)
+			handler.ServeHTTP(w, r)
+		})
+	}
 }
 
 // BasicAuthMiddleware returns a Middleware that requires the specified

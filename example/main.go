@@ -29,11 +29,7 @@ func ListProducts(w http.ResponseWriter, r *http.Request) {
 
 func AddProduct(w http.ResponseWriter, r *http.Request) {
 	var product Product
-	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
+	json.NewDecoder(r.Body).Decode(&product)
 	Products[newProductID()] = product
 	w.WriteHeader(200)
 }
@@ -74,7 +70,7 @@ func main() {
 		},
 	}
 
-	rm.ApplyMiddleware(router.LoggingMiddleware)
+	rm.ApplyMiddleware(router.LoggingMiddleware())
 	r := router.NewRouter(rm.VariableMatch())
 	log.Printf("Listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", r))
