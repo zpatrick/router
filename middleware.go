@@ -30,6 +30,7 @@ func BasicAuthMiddleware(username, password string) Middleware {
 			user, pass, ok := r.BasicAuth()
 			if ok && sha256.Sum256([]byte(user+pass)) == sum {
 				handler.ServeHTTP(w, r)
+				return
 			}
 
 			w.Header().Set("WWW-Authenticate", "Basic realm=\"Restricted\"")
